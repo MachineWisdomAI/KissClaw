@@ -1,0 +1,95 @@
+name: KissClaw Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to build from (tag or release branch)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Verify checkout integrity
+        run: |
+          set -euo pipefail
+          intended_ref="${{ inputs.ref || github.ref }}"
+          # Annotated tags need dereferencing to get the commit SHA.
+          intended_sha=$(git rev-list -n 1 "$intended_ref")
+          actual_sha=$(git rev-parse HEAD)
+          if [ "$intended_sha" != "$actual_sha" ]; then
+            echo "ERROR: actual HEAD ($actual_sha) does not match intended ref ($intended_ref -> $intended_sha)"
+            exit 1
+          fi
+          default_branch=$(gh api "repos/${{ github.repository }}" --jq .default_branch)
+          default_sha=$(gh api "repos/${{ github.repository }}/git/refs/heads/$default_branch" --jq .object.sha)
+          if [ "$actual_sha" = "$default_sha" ]; then
+            echo "ERROR: HEAD equals default-branch HEAD ($default_sha). Release builds must be from a tag or release branch, not the upstream mirror."
+            exit 1
+          fi
+          echo "OK: HEAD=$actual_sha matches intended ref $intended_ref (resolved to $intended_sha), distinct from default-branch HEAD ($default_sha on $default_branch)."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Package tarball
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version")
+          name=$(node -p "require('./package.json').name")
+          pnpm pack
+          tarball="${name}-${version}.tgz"
+          mv *.tgz "kissclaw-${version}.tgz"
+          tarball="kissclaw-${version}.tgz"
+          sha256sum "$tarball" > "${tarball}.sha256"
+          echo "TARBALL=$tarball" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Generate release metadata
+        run: |
+          set -euo pipefail
+          cat > "kissclaw-release-metadata.json" <<METADATA
+          {
+            "name": "kissclaw",
+            "version": "$VERSION",
+            "ref": "${{ inputs.ref || github.ref }}",
+            "sha": "$(git rev-parse HEAD)",
+            "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          METADATA
+
+      - name: Upload release assets
+        if: github.event_name == 'release'
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            "$TARBALL" \
+            "${TARBALL}.sha256" \
+            "kissclaw-release-metadata.json" \
+            --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
