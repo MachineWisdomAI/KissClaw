@@ -1,3 +1,8 @@
+> **KissClaw** is a production-stability downstream of OpenClaw.
+> See [KISSCLAW.md](KISSCLAW.md) for boundary and branch model,
+> [BACKPORT_POLICY.md](BACKPORT_POLICY.md) for cherry-pick eligibility (D8/D9/D10),
+> and [RELEASE_WORKFLOW.md](RELEASE_WORKFLOW.md) for the release procedure (D7 invariant).
+
 # 🦞 OpenClaw — Personal AI Assistant
 
 <p align="center">
