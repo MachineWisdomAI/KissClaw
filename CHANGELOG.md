@@ -1,5 +1,20 @@
 # KissClaw Changelog
 
+## KissClaw 1.0.1-rc.2
+
+Baseline: OpenClaw v2026.4.20 (`8116e638f3`).
+
+Same fix set as 1.0.1-rc.1 plus the build-unblocking type extension below.
+The 1.0.1-rc.1 release artifacts failed to build because of this type
+mismatch and never published tarballs; this RC supersedes it.
+
+### Fixes
+
+- fix(agents): extend onAgentEvent callback type with sessionKey (triage)
+  - Type-only extension required by the lifecycle backstop cherry-pick.
+  - Subset of upstream `1184925572` (excluded under D8 as a CI-perf
+    refactor); only the type signature is included.
+
 ## KissClaw 1.0.1-rc.1
 
 Baseline: OpenClaw v2026.4.20 (`8116e638f3`).
