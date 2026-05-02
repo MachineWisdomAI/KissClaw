@@ -1,0 +1,128 @@
+name: kc-check-imports
+
+on:
+  pull_request:
+    branches:
+      - "ga/**"
+      - "lts/**"
+  workflow_dispatch:
+    inputs:
+      baseline:
+        description: "Baseline ref (tag or SHA) to validate against"
+        required: false
+        default: "v2026.4.20"
+        type: string
+      range:
+        description: "Range or candidates (e.g. origin/ga/1.0..HEAD)"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-imports:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch baseline tag
+        run: |
+          set -euo pipefail
+          baseline="${{ inputs.baseline || 'v2026.4.20' }}"
+          if ! git rev-parse "$baseline" >/dev/null 2>&1; then
+            echo "Baseline ref '$baseline' not found locally; fetching tags from origin."
+            git fetch origin --tags --force
+          fi
+          if ! git rev-parse "$baseline" >/dev/null 2>&1; then
+            echo "ERROR: baseline ref '$baseline' not found after fetch. Push the tag to origin or pass --baseline=<full-sha>."
+            exit 1
+          fi
+
+      - name: Checkout kissclaw-tools
+        uses: actions/checkout@v4
+        with:
+          repository: MachineWisdomAI/kissclaw-tools
+          path: .kissclaw-tools
+          token: ${{ secrets.KISSCLAW_TOOLS_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install kissclaw-tools dependencies
+        working-directory: .kissclaw-tools
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm install --frozen-lockfile
+          elif [ -f package.json ]; then
+            pnpm install
+          else
+            echo "kissclaw-tools has no package.json yet; installing typescript locally for module resolution."
+            npm install --no-save typescript
+          fi
+
+      - name: Install repo dependencies (for TS module resolution)
+        run: pnpm install --frozen-lockfile
+
+      - name: Resolve range
+        id: range
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.range }}" ]; then
+            range="${{ inputs.range }}"
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            base_ref="origin/${{ github.base_ref }}"
+            git fetch origin "${{ github.base_ref }}" --depth=200
+            range="${base_ref}..HEAD"
+          else
+            range="origin/ga/1.0..HEAD"
+          fi
+          echo "range=$range" >> "$GITHUB_OUTPUT"
+
+      - name: kc-check-imports — per-candidate
+        id: candidates
+        run: |
+          set -euo pipefail
+          baseline="${{ inputs.baseline || 'v2026.4.20' }}"
+          range="${{ steps.range.outputs.range }}"
+          echo "Running kc-check-imports --candidates $range against baseline $baseline"
+          node .kissclaw-tools/kc-check-imports.mjs \
+            --baseline "$baseline" \
+            --candidates "$range" \
+            --repo "$PWD" \
+            > kc-check-imports-candidates.json
+          cat kc-check-imports-candidates.json
+        continue-on-error: false
+
+      - name: kc-check-imports — final-tree
+        if: always()
+        run: |
+          set -euo pipefail
+          baseline="${{ inputs.baseline || 'v2026.4.20' }}"
+          range="${{ steps.range.outputs.range }}"
+          echo "Running kc-check-imports --final-tree $range against baseline $baseline"
+          node .kissclaw-tools/kc-check-imports.mjs \
+            --baseline "$baseline" \
+            --final-tree "$range" \
+            --repo "$PWD" \
+            > kc-check-imports-final-tree.json
+          cat kc-check-imports-final-tree.json
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kc-check-imports-reports
+          path: |
+            kc-check-imports-candidates.json
+            kc-check-imports-final-tree.json
