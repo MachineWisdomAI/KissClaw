@@ -30,7 +30,11 @@ export type SubscribeEmbeddedPiSessionParams = {
   blockReplyChunking?: BlockReplyChunking;
   onPartialReply?: (payload: { text?: string; mediaUrls?: string[] }) => void | Promise<void>;
   onAssistantMessageStart?: () => void | Promise<void>;
-  onAgentEvent?: (evt: { stream: string; data: Record<string, unknown> }) => void | Promise<void>;
+  onAgentEvent?: (evt: {
+    stream: string;
+    data: Record<string, unknown>;
+    sessionKey?: string;
+  }) => void | Promise<void>;
   enforceFinalTag?: boolean;
   silentExpected?: boolean;
   config?: OpenClawConfig;
