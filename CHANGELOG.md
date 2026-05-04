@@ -1,5 +1,19 @@
 # KissClaw Changelog
 
+## KissClaw 1.0.1-rc.3
+
+Baseline: OpenClaw v2026.4.20 (`8116e638f3`).
+
+Drop-in upstream compatibility fix. No code changes.
+
+### Changes
+
+- fix(governance): restore `bin: openclaw` for upstream drop-in compatibility
+  - The rc.2 tarball installed a `kissclaw` binary instead of `openclaw`,
+    breaking compatibility with existing configs, LaunchAgents, and shell
+    history that reference `openclaw`.
+- docs: update README banner with install instructions and migration steps
+
 ## KissClaw 1.0.1-rc.2
 
 Baseline: OpenClaw v2026.4.20 (`8116e638f3`).
