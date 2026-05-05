@@ -1379,7 +1379,9 @@ describe("gateway agent handler", () => {
     const callArgs = await waitForAgentCommandCall();
     expect(callArgs.channel).toBe("telegram");
     expect(callArgs.messageChannel).toBe("webchat");
-    expect(callArgs.runContext?.messageChannel).toBe("webchat");
+    expect((callArgs.runContext as Record<string, unknown> | undefined)?.messageChannel).toBe(
+      "webchat",
+    );
   });
 
   it.skip("terminalizes successful async gateway agent runs in the shared task registry", async () => {

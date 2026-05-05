@@ -1244,6 +1244,7 @@ export const sessionsHandlers: GatewayRequestHandlers = {
     // correct dedupe namespace: agent-kind runs use "agent:" (their runId equals
     // their idempotency key), while chat-send runs use "chat:" so the abort
     // snapshot does not collide with the agent RPC dedupe cache.
+    const requestedRunId = readStringValue(p.runId);
     const preAbortRunKinds = new Map<string, "chat-send" | "agent" | undefined>();
     if (requestedRunId) {
       preAbortRunKinds.set(requestedRunId, context.chatAbortControllers.get(requestedRunId)?.kind);

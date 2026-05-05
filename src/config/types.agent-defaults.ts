@@ -178,6 +178,8 @@ export type AgentDefaultsConfig = {
   params?: Record<string, unknown>;
   /** Default embedded agent harness policy. */
   embeddedHarness?: AgentEmbeddedHarnessConfig;
+  /** Agent runtime selection. */
+  agentRuntime?: { id: string; fallback?: string };
   /** Primary model and fallbacks (provider/model). Accepts string or {primary,fallbacks}. */
   model?: AgentModelConfig;
   /** Optional image-capable model and fallbacks (provider/model). Accepts string or {primary,fallbacks}. */

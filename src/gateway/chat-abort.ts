@@ -9,6 +9,7 @@ export type ChatAbortControllerEntry = {
   expiresAtMs: number;
   ownerConnId?: string;
   ownerDeviceId?: string;
+  kind?: "chat-send" | "agent";
 };
 
 export function isChatStopCommandText(text: string): boolean {
