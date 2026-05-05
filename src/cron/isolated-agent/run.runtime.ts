@@ -16,6 +16,7 @@ export {
   isThinkingLevelSupported,
   normalizeThinkLevel,
   resolveSupportedThinkingLevel,
+  supportsXHighThinking,
 } from "../../auto-reply/thinking.js";
 export { resolveSessionTranscriptPath } from "../../config/sessions/paths.js";
 export { setSessionRuntimeModel } from "../../config/sessions/types.js";
