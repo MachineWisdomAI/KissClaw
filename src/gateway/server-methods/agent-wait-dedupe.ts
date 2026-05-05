@@ -2,6 +2,7 @@ import type { DedupeEntry } from "../server-shared.js";
 
 export type AgentWaitTerminalSnapshot = {
   status: "ok" | "error" | "timeout";
+  stopReason?: string;
   startedAt?: number;
   endedAt?: number;
   error?: string;

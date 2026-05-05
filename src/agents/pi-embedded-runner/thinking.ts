@@ -10,6 +10,8 @@ type RecoverySessionMeta = { id: string; recoveredAnthropicThinking?: boolean };
 
 const THINKING_BLOCK_ERROR_PATTERN = /thinking or redacted_thinking blocks?.* cannot be modified/i;
 
+export const OMITTED_ASSISTANT_REASONING_TEXT = "[reasoning omitted]";
+
 export function isAssistantMessageWithContent(message: AgentMessage): message is AssistantMessage {
   return (
     !!message &&

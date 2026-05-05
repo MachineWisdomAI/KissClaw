@@ -105,6 +105,7 @@ export type DetachedTaskLifecycleRuntime = {
   completeTaskRunByRunId: (params: DetachedTaskCompleteParams) => TaskRecord[];
   failTaskRunByRunId: (params: DetachedTaskFailParams) => TaskRecord[];
   setDetachedTaskDeliveryStatusByRunId: (params: DetachedTaskDeliveryStatusParams) => TaskRecord[];
+  finalizeTaskRunByRunId?: (params: DetachedTaskCompleteParams) => TaskRecord[];
   /**
    * Return `found: false` when this runtime does not own the task so core can
    * fall back to the legacy detached-task cancel path.

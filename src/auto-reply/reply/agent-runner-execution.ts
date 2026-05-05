@@ -80,6 +80,11 @@ import type { TypingSignaler } from "./typing-mode.js";
 // selection keeps conflicting with fallback model choices.
 // See: https://github.com/openclaw/openclaw/issues/58348
 export const MAX_LIVE_SWITCH_RETRIES = 2;
+
+export function buildContextOverflowRecoveryText(_params: Record<string, unknown>): string {
+  return "Context overflow detected. Consider reducing reserveTokensFloor or compaction buffer.";
+}
+
 const GPT_CHAT_BREVITY_ACK_MAX_CHARS = 420;
 const GPT_CHAT_BREVITY_ACK_MAX_SENTENCES = 3;
 const GPT_CHAT_BREVITY_SOFT_MAX_CHARS = 900;

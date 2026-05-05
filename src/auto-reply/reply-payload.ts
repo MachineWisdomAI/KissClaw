@@ -24,6 +24,7 @@ export type ReplyPayload = {
   isCompactionNotice?: boolean;
   /** Channel-specific payload data (per-channel envelope). */
   channelData?: Record<string, unknown>;
+  delivery?: Record<string, unknown>;
 };
 
 export type ReplyPayloadMetadata = {

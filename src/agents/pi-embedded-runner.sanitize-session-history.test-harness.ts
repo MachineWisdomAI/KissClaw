@@ -113,6 +113,7 @@ export async function loadSanitizeSessionHistoryWithCleanMocks(): Promise<Saniti
 
 export function makeReasoningAssistantMessages(opts?: {
   thinkingSignature?: "object" | "json";
+  includeText?: boolean;
 }): AgentMessage[] {
   const thinkingSignature: unknown =
     opts?.thinkingSignature === "json"

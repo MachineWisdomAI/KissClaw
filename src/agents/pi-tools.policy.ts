@@ -451,3 +451,4 @@ export function resolveGroupToolPolicy(params: {
 }
 
 export { isToolAllowedByPolicies, isToolAllowedByPolicyName } from "./tool-policy-match.js";
+export { resolveTrustedGroupId } from "./pi-embedded-runner/effective-tool-policy.js";
