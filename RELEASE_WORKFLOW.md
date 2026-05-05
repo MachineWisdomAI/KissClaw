@@ -31,8 +31,18 @@ invariant makes this structurally impossible.
 6. Write `CHANGELOG.md` for the RC (only actually-included fixes).
 7. Open PR: `release/vX.Y.Z-rc.N` -> `ga/X.Y`.
 8. CI runs `kc-check-imports` per-candidate AND `--final-tree`.
-9. Merge, create annotated tag `vX.Y.Z-rc.N`, push tag.
-10. Create GitHub release (prerelease) — triggers `kissclaw-release.yml`.
+9. **Local artifact proof (mandatory before tagging):**
+   ```
+   pnpm install --frozen-lockfile
+   pnpm build
+   pnpm pack
+   npm install -g ./kissclaw-X.Y.Z-rc.N.tgz
+   openclaw --version          # must report X.Y.Z-rc.N
+   ```
+   Verify `KISSCLAW_UPSTREAM.json` matches the intended baseline.
+   If any step fails, fix the branch first. Never tag and chase CI.
+10. Merge, create annotated tag `vX.Y.Z-rc.N`, push tag.
+11. Create GitHub release (prerelease) — triggers `kissclaw-release.yml`.
 
 ### Verifying a release (Phase 6 gate)
 
@@ -45,7 +55,7 @@ After the release workflow completes:
 5. Verify `package.json` version inside the tarball is `X.Y.Z-rc.N`.
 6. Verify `package.json` name is `kissclaw`.
 7. Test install: `npm install -g ./kissclaw-X.Y.Z-rc.N.tgz`.
-8. Verify `kissclaw --version` reports `X.Y.Z-rc.N`.
+8. Verify `openclaw --version` reports `X.Y.Z-rc.N`.
 
 ### Promoting to GA
 
@@ -53,3 +63,17 @@ After the release workflow completes:
 2. Retag or cut a new tag without the `-rc.N` suffix.
 3. Create a non-prerelease GitHub release.
 4. Update `KISSCLAW_UPSTREAM.json` if the baseline changed.
+
+## Operational Principles
+
+**A release tag is only created after local artifact proof on the final release
+branch tip.** If proof fails, fix the branch first. Never tag and chase CI.
+
+**RC tags are cheap semantically but not operationally.** A failed RC tag
+pollutes release history, FAVA records, and human confidence. Treat RC tags
+with the same discipline as GA tags.
+
+**A clean rebase is not a shippable tree.** Rebase proves Git could replay
+commits textually. It does not prove lockfile coherence, build correctness,
+barrel export completeness, or post-install functionality. The proof sequence
+in step 9 exists because of this gap.
