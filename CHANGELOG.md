@@ -1,5 +1,22 @@
 # KissClaw Changelog
 
+## KissClaw 1.1.0-rc.2
+
+Baseline: OpenClaw v2026.4.23 (`a9797214338b`).
+
+### Fixes
+
+- fix(governance): restore `name: openclaw` in package.json for Node module
+  resolution compatibility. `name: kissclaw` broke all `openclaw/plugin-sdk/*`
+  imports (bundled plugins, runtime deps, third-party plugins) because Node's
+  exports map self-referencing requires the package name to match the import
+  specifier. The tarball remains downloadable from the KissClaw release page;
+  the npm package identity is `openclaw` so `npm install -g <tarball>` installs
+  to `/usr/lib/node_modules/openclaw` (same as upstream — uninstall the other
+  first).
+
+---
+
 ## KissClaw 1.1.0-rc.1
 
 Baseline upgraded: OpenClaw v2026.4.20 → v2026.4.23 (`a9797214338b`).
