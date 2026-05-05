@@ -1,5 +1,17 @@
 # KissClaw Changelog
 
+## KissClaw 1.1.0-rc.1
+
+Baseline upgraded: OpenClaw v2026.4.20 → v2026.4.23 (`a9797214338b`).
+
+### Changes
+
+- Upstream baseline upgraded from v2026.4.20 to v2026.4.23 (1,277 upstream commits).
+- 3 original downstream fixes auto-dropped as already-upstream at v2026.4.23.
+- 0 new post-v2026.4.23 cherry-picks (all 5 candidates conflict due to module reorganization between v2026.4.23 and upstream/main; deferred to next baseline upgrade).
+
+---
+
 ## KissClaw 1.0.1-rc.3
 
 Baseline: OpenClaw v2026.4.20 (`8116e638f3`).

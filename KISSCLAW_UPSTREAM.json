@@ -1,7 +1,7 @@
 {
-  "remote": "https://github.com/openclaw-org/openclaw",
-  "packageVersion": "2026.4.20",
-  "tag": "v2026.4.20",
-  "commit": "8116e638f303f5f6539355f0f3f70738bc306c49",
-  "releaseDate": "2026-04-21T19:58:49.993Z"
+  "remote": "https://github.com/openclaw/openclaw",
+  "packageVersion": "2026.4.23",
+  "tag": "v2026.4.23",
+  "commit": "a9797214338ba31c52c796adbb75afb16e0684a9",
+  "releaseDate": "2026-04-24T16:30:05.632Z"
 }
